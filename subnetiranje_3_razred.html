@@ -1,0 +1,824 @@
+<!doctype html>
+<html lang="hr">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Subnetiranje — 3. razred</title>
+    <style>
+        * {
+            box-sizing: border-box
+        }
+
+        :root {
+            --bg: #0b1222;
+            --panel: #142139;
+            --text: #edf4ff;
+            --muted: #b4c5de;
+            --accent: #56dfc1;
+            --blue: #8db8ff
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font: 20px/1.6 system-ui, sans-serif
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            background: #0b1222f5;
+            z-index: 5;
+            border-bottom: 1px solid #30435e;
+            padding: 12px 4%;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap
+        }
+
+        header b {
+            color: var(--accent);
+            margin-right: auto
+        }
+
+        button,
+        select,
+        input {
+            font: inherit;
+            border-radius: 9px;
+            padding: 9px 14px;
+            border: 1px solid #526888
+        }
+
+        button {
+            background: var(--accent);
+            color: #092019;
+            font-weight: 650;
+            cursor: pointer
+        }
+
+        button.secondary,
+        select {
+            background: #1d304d;
+            color: var(--text)
+        }
+
+        button:disabled {
+            opacity: .4;
+            cursor: default
+        }
+
+        button:focus-visible,
+        a:focus-visible,
+        summary:focus-visible,
+        input:focus-visible,
+        select:focus-visible {
+            outline: 3px solid #ffda7a;
+            outline-offset: 4px
+        }
+
+        main {
+            max-width: 1180px;
+            margin: auto;
+            padding: 36px 24px 100px
+        }
+
+        .slide {
+            display: none;
+            animation: appear .2s ease
+        }
+
+        .slide.active {
+            display: block
+        }
+
+        .eyebrow {
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--accent);
+            font-size: 15px
+        }
+
+        h1 {
+            font-size: clamp(32px, 4.5vw, 57px);
+            line-height: 1.15;
+            margin: 14px 0 28px;
+            letter-spacing: -1px
+        }
+
+        h3 {
+            color: var(--blue);
+            margin-top: 0
+        }
+
+        .lead {
+            font-size: 28px
+        }
+
+        .hero {
+            font-size: clamp(30px, 5vw, 64px);
+            padding: 28px;
+            background: var(--panel);
+            border-radius: 16px;
+            font-family: monospace
+        }
+
+        .hero span {
+            color: var(--accent)
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px
+        }
+
+        article,
+        .note {
+            background: var(--panel);
+            padding: 22px;
+            border-radius: 14px
+        }
+
+        article p:last-child {
+            margin-bottom: 0
+        }
+
+        .note {
+            border-left: 4px solid var(--accent);
+            margin: 24px 0
+        }
+
+        .note.error {
+            border-color: #ff9292
+        }
+
+        pre {
+            background: #101d32;
+            padding: 24px;
+            border-radius: 12px;
+            overflow-x: auto;
+            line-height: 1.8;
+            font-size: clamp(14px, 1.8vw, 22px)
+        }
+
+        code {
+            color: var(--accent);
+            overflow-wrap: anywhere
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: clamp(14px, 1.8vw, 20px)
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 14px 10px;
+            border-bottom: 1px solid #354962
+        }
+
+        th {
+            color: var(--accent)
+        }
+
+        li {
+            margin: 12px 0
+        }
+
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #0b1222f5;
+            border-top: 1px solid #30435e;
+            padding: 12px 4%;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            z-index: 5
+        }
+
+        #progress {
+            height: 4px;
+            background: var(--accent);
+            position: absolute;
+            top: -4px;
+            left: 0;
+            transition: width .2s
+        }
+
+        #counter {
+            margin-right: auto;
+            color: var(--muted)
+        }
+
+        a {
+            color: #91c8ff
+        }
+
+        summary {
+            cursor: pointer;
+            color: var(--accent);
+            padding: 14px
+        }
+
+        details {
+            background: var(--panel);
+            padding: 12px;
+            border-radius: 12px
+        }
+
+        label {
+            display: block
+        }
+
+        input:not([type=radio]) {
+            background: #f3f7ff;
+            color: #142139;
+            max-width: 100%
+        }
+
+        input[type=range] {
+            width: 100%;
+            padding: 0;
+            margin: 20px 0;
+            accent-color: var(--accent)
+        }
+
+        .controls {
+            display: flex;
+            gap: 20px;
+            align-items: end;
+            flex-wrap: wrap
+        }
+
+        #cp {
+            width: 110px
+        }
+
+        #bits {
+            display: grid;
+            gap: 12px
+        }
+
+        .bitrow {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap
+        }
+
+        .bitrow small {
+            width: 60px;
+            color: var(--muted)
+        }
+
+        .octet {
+            display: flex;
+            gap: 2px;
+            margin-right: 8px
+        }
+
+        .bit {
+            display: inline-block;
+            text-align: center;
+            width: 24px;
+            border-radius: 3px;
+            font: 20px/1.7 monospace
+        }
+
+        .net {
+            background: #225d68;
+            color: #c7fff3
+        }
+
+        .host {
+            background: #57462c;
+            color: #ffe0a6
+        }
+
+        .key {
+            padding: 6px 10px;
+            border-radius: 5px
+        }
+
+        .question {
+            border: 1px solid #354962;
+            border-radius: 12px;
+            padding: 18px;
+            margin: 16px 0
+        }
+
+        .question label {
+            padding: 6px;
+            cursor: pointer
+        }
+
+        .feedback {
+            color: #bdebd7
+        }
+
+        .all .slide {
+            display: block;
+            border-bottom: 2px solid #354962;
+            padding: 35px 0
+        }
+
+        .all footer {
+            position: sticky
+        }
+
+        .all main {
+            padding-bottom: 20px
+        }
+
+        #help {
+            color: var(--muted);
+            font-size: 14px
+        }
+
+        @keyframes appear {
+            from {
+                opacity: .4
+            }
+
+            to {
+                opacity: 1
+            }
+        }
+
+        @media(max-width:600px) {
+            body {
+                font-size: 17px
+            }
+
+            header {
+                padding: 10px
+            }
+
+            header b {
+                display: none
+            }
+
+            main {
+                padding: 24px 14px 110px
+            }
+
+            header button,
+            header select {
+                font-size: 14px;
+                padding: 7px
+            }
+
+            td,
+            th {
+                padding: 9px 4px
+            }
+
+            .bit {
+                width: 19px;
+                font-size: 16px
+            }
+
+            .hero {
+                padding: 18px
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+                color: black;
+                font-size: 12pt
+            }
+
+            header,
+            footer,
+            #help,
+            button {
+                display: none !important
+            }
+
+            main {
+                padding: 0;
+                max-width: none
+            }
+
+            .slide,
+            .all .slide {
+                display: block;
+                break-after: page;
+                padding: 12px;
+                border: 0
+            }
+
+            h1 {
+                font-size: 28pt
+            }
+
+            article,
+            .note,
+            pre,
+            details {
+                background: #f0f4f7;
+                color: black
+            }
+
+            code,
+            h3,
+            a,
+            .eyebrow,
+            th {
+                color: #164d65
+            }
+
+            details>* {
+                display: block
+            }
+
+            input {
+                border: 1px solid #777
+            }
+
+            a {
+                overflow-wrap: anywhere
+            }
+
+            .net,
+            .host {
+                color: black
+            }
+
+            .question {
+                break-inside: avoid
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header><b>NET / UČIONICA</b><label for="jump" style="font-size:14px">Slajd</label><select id="jump"
+            aria-label="Odaberi slajd"></select><button class="secondary" id="view" onclick="toggleAll()">Svi
+            slajdovi</button><button class="secondary" onclick="full()">Cijeli zaslon</button><button class="secondary"
+            onclick="window.print()">Ispis / PDF</button></header>
+    <main>
+        <section class="slide" data-title="Subnetiranje">
+            <div class="eyebrow">Subnetiranje</div>
+            <h1>Jedna mreža. Više smislenih cjelina.</h1>
+            <p class="lead">Kako računalo zna je li odredište u njegovoj mreži?</p>
+            <div class="hero">192.168.10.70<span>/26</span></div>
+            <p>3. razred · Tehničar za računarstvo · IPv4</p>
+            <div class="note">Ishod: Objasniti ulogu mrežne maske u strukturi IP adrese te ulogu subnetiranja.</div>
+        </section>
+        <section class="slide" data-title="Ciljevi">
+            <div class="eyebrow">Ciljevi</div>
+            <h1>Na kraju možeš…</h1>
+            <ul>
+                <li>Razlikovati mrežni dio i dio za uređaj u IPv4 adresi.</li>
+                <li>Povezati mrežnu masku s prefiksom /24, /25 i /26.</li>
+                <li>Objasniti kako logička operacija AND daje mrežnu adresu.</li>
+                <li>Objasniti zašto mrežu dijelimo na podmreže.</li>
+                <li>Odrediti mrežnu adresu, broadcast i raspon adresa jednostavne podmreže.</li>
+            </ul>
+            <p class="note">Pitanje za početak: Jesu li 192.168.10.20 i 192.168.10.200 uvijek u istoj podmreži? Ne
+                možemo odlučiti bez maske.</p>
+        </section>
+        <section class="slide" data-title="Problem iz škole">
+            <div class="eyebrow">Problem iz škole</div>
+            <h1>Tri skupine uređaja</h1>
+            <div class="grid">
+                <article>
+                    <h3>Učionica</h3>
+                    <p>Računala učenika</p>
+                </article>
+                <article>
+                    <h3>Zbornica</h3>
+                    <p>Računala nastavnika</p>
+                </article>
+                <article>
+                    <h3>Laboratorij</h3>
+                    <p>Oprema za vježbe</p>
+                </article>
+            </div>
+            <p>Polazni blok: <code>192.168.10.0/24</code>. Želimo odvojene logičke mreže i pregledno adresiranje.</p>
+            <p>Subnetiranjem planiramo IP podmreže. Za odvojene mreže na zajedničkim preklopnicima obično koristimo
+                VLAN-ove, za komunikaciju među podmrežama usmjernik ili L3 preklopnik.</p>
+            <div class="note">Subnetiranje samo po sebi nije vatrozid. Pristup se ograničava pravilima, primjerice
+                ACL-ovima ili vatrozidom.</div>
+        </section>
+        <section class="slide" data-title="IPv4">
+            <div class="eyebrow">IPv4</div>
+            <h1>32 bita u četiri okteta</h1>
+            <div class="hero">192 . 168 . 10 . 70</div>
+            <pre>11000000 . 10101000 . 00001010 . 01000110</pre>
+            <ul>
+                <li>Svaki oktet ima 8 bitova i vrijednost od 0 do 255.</li>
+                <li>Adresa ima mrežni dio i dio za uređaj (host).</li>
+                <li>Granica između dijelova nije uvijek na točki između okteta.</li>
+            </ul>
+            <p class="note">Sama IP adresa ne govori gdje je granica. Za to trebamo mrežnu masku ili duljinu prefiksa.
+            </p>
+        </section>
+        <section class="slide" data-title="Mrežna maska">
+            <div class="eyebrow">Mrežna maska</div>
+            <h1>Jedinice čuvaju mrežni dio</h1>
+            <pre>IP:     192.168.10.70
+Maska:  255.255.255.0
+Binarno:11111111.11111111.11111111.00000000</pre>
+            <div class="grid">
+                <article>
+                    <h3>1 u maski</h3>
+                    <p>Označuje bit mrežnog dijela.</p>
+                </article>
+                <article>
+                    <h3>0 u maski</h3>
+                    <p>Označuje bit dijela za uređaj.</p>
+                </article>
+            </div>
+            <p>U uobičajenoj CIDR maski jedinice su neprekinuti niz slijeva, a zatim slijede nule. Maska se primjenjuje
+                na bitove, a ne samo na cijele oktete.</p>
+        </section>
+        <section class="slide" data-title="CIDR zapis">
+            <div class="eyebrow">CIDR zapis</div>
+            <h1>Što znači /26?</h1>
+            <p>Broj nakon kose crte označuje broj mrežnih bitova.</p>
+            <pre>/26 = 11111111.11111111.11111111.11000000
+    = 255.255.255.192
+26 mrežnih bitova + 6 host bitova = 32 bita</pre>
+            <table>
+                <tr>
+                    <th>Prefiks</th>
+                    <th>Maska</th>
+                    <th>Host bitovi</th>
+                    <th>Ukupno adresa</th>
+                </tr>
+                <tr>
+                    <td>/24</td>
+                    <td>255.255.255.0</td>
+                    <td>8</td>
+                    <td>256</td>
+                </tr>
+                <tr>
+                    <td>/25</td>
+                    <td>255.255.255.128</td>
+                    <td>7</td>
+                    <td>128</td>
+                </tr>
+                <tr>
+                    <td>/26</td>
+                    <td>255.255.255.192</td>
+                    <td>6</td>
+                    <td>64</td>
+                </tr>
+                <tr>
+                    <td>/27</td>
+                    <td>255.255.255.224</td>
+                    <td>5</td>
+                    <td>32</td>
+                </tr>
+            </table>
+        </section>
+        <section class="slide" data-title="Binarni laboratorij">
+            <div class="eyebrow">Binarni laboratorij</div>
+            <h1>Pomakni granicu mreže</h1>
+            <p>Promatraj adresu <code>192.168.10.70</code>. Promijeni prefiks i objasni što se mijenja, a što ostaje
+                isto.</p><label for="prefix">Duljina prefiksa: <output id="pv">/26</output></label><input id="prefix"
+                type="range" min="24" max="30" value="26">
+            <div id="bits"></div>
+            <div id="lab" class="note" aria-live="polite"></div>
+            <p><span class="key net">Mrežni bitovi</span> <span class="key host">Host bitovi</span></p>
+        </section>
+        <section class="slide" data-title="Logički AND">
+            <div class="eyebrow">Logički AND</div>
+            <h1>Kako nastaje mrežna adresa?</h1>
+            <p>AND daje 1 samo ako su oba bita 1. Ostale kombinacije daju 0.</p>
+            <pre>Posljednji oktet adrese 70:  01000110
+Posljednji oktet maske 192:  11000000
+                           ────────
+Rezultat AND = 64:          01000000</pre>
+            <p><code>192.168.10.70 AND 255.255.255.192 = 192.168.10.64</code></p>
+            <p class="note">Mrežna adresa je 192.168.10.64/26. AND zadržava mrežne bitove adrese, a host bitove
+                postavlja na nulu.</p>
+        </section>
+        <section class="slide" data-title="Ista ili druga mreža?">
+            <div class="eyebrow">Ista ili druga mreža?</div>
+            <h1>Usporedi mrežne adrese</h1>
+            <p>Računalo A: <code>192.168.10.70/26</code></p>
+            <table>
+                <tr>
+                    <th>Odredište</th>
+                    <th>Odredište AND maska A</th>
+                    <th>Zaključak računala A</th>
+                </tr>
+                <tr>
+                    <td>192.168.10.100</td>
+                    <td>192.168.10.64</td>
+                    <td>Ista podmreža</td>
+                </tr>
+                <tr>
+                    <td>192.168.10.130</td>
+                    <td>192.168.10.128</td>
+                    <td>Druga podmreža</td>
+                </tr>
+            </table>
+            <p>U jednostavnoj LAN mreži računalo šalje lokalnom odredištu izravno, a udaljenom preko zadanog
+                pristupnika, prema svojoj tablici usmjeravanja.</p>
+            <p class="note">Za usporedbu lokalno/udaljeno računalo primjenjuje vlastitu masku. Ispravna konfiguracija
+                svih uređaja preduvjet je očekivanog ponašanja.</p>
+        </section>
+        <section class="slide" data-title="Subnetiranje">
+            <div class="eyebrow">Subnetiranje</div>
+            <h1>Posuđujemo bitove za podmreže</h1>
+            <p>Subnetiranje dijeli veći adresni blok na manje logičke podmreže produljenjem prefiksa.</p>
+            <pre>Početno /24: [ 24 mrežna bita ][ 8 host bitova ]
+Novo    /26: [ 24 mrežna bita ][ 2 ][ 6 host bitova ]
+                                 ↑
+                        bitovi za podmreže</pre>
+            <ul>
+                <li>Posuđujemo 2 bita: 2² = 4 jednake podmreže.</li>
+                <li>Ostaje 6 host bitova: 2⁶ = 64 adrese u svakoj podmreži.</li>
+                <li>U običnoj /26 LAN podmreži: 64 − 2 = 62 adrese za sučelja uređaja.</li>
+            </ul>
+            <div class="note">Dulji prefiks → manja podmreža. Dijeljenjem ne stvaramo dodatne IP adrese.</div>
+        </section>
+        <section class="slide" data-title="Tri vrste adresa">
+            <div class="eyebrow">Tri vrste adresa</div>
+            <h1>Mreža, uređaji i broadcast</h1>
+            <p>Primjer: <code>192.168.10.64/26</code></p>
+            <div class="grid">
+                <article>
+                    <h3>Mrežna adresa</h3>
+                    <p>192.168.10.64</p>
+                    <p>Host bitovi su svi 0, označuje podmrežu.</p>
+                </article>
+                <article>
+                    <h3>Adrese uređaja</h3>
+                    <p>192.168.10.65–126</p>
+                    <p>62 adrese za sučelja, uključujući pristupnik.</p>
+                </article>
+                <article>
+                    <h3>Broadcast</h3>
+                    <p>192.168.10.127</p>
+                    <p>Host bitovi su svi 1; odredište za sve uređaje podmreže.</p>
+                </article>
+            </div>
+            <p class="note">Formula 2ʰ − 2 odnosi se na uobičajene IPv4 podmreže s mrežnom i broadcast adresom. Posebni
+                slučajevi /31 i /32 nisu predmet ove vježbe.</p>
+        </section>
+        <section class="slide" data-title="Vođeni primjer">
+            <div class="eyebrow">Vođeni primjer</div>
+            <h1>Podijeli /24 na četiri /26</h1>
+            <p>Za /26 korak u posljednjem oktetu je <code>256 − 192 = 64</code>. Počeci su 0, 64, 128 i 192.</p>
+            <table>
+                <tr>
+                    <th>Podmreža</th>
+                    <th>Adrese uređaja</th>
+                    <th>Broadcast</th>
+                </tr>
+                <tr>
+                    <td>192.168.10.0/26</td>
+                    <td>.1 – .62</td>
+                    <td>.63</td>
+                </tr>
+                <tr>
+                    <td>192.168.10.64/26</td>
+                    <td>.65 – .126</td>
+                    <td>.127</td>
+                </tr>
+                <tr>
+                    <td>192.168.10.128/26</td>
+                    <td>.129 – .190</td>
+                    <td>.191</td>
+                </tr>
+                <tr>
+                    <td>192.168.10.192/26</td>
+                    <td>.193 – .254</td>
+                    <td>.255</td>
+                </tr>
+            </table>
+            <p>U skraćenim zapisima u tablici početak svake adrese je 192.168.10.</p>
+            <p class="note">Pravilo 256 − vrijednost maske ovdje koristimo u posljednjem oktetu. Za šire prefikse
+                granice treba određivati u odgovarajućem oktetu.</p>
+        </section>
+        <section class="slide" data-title="Primjena u školi">
+            <div class="eyebrow">Primjena u školi</div>
+            <h1>Plan adresiranja</h1>
+            <table>
+                <tr>
+                    <th>Namjena</th>
+                    <th>Podmreža</th>
+                    <th>Predloženi pristupnik</th>
+                </tr>
+                <tr>
+                    <td>Učionica</td>
+                    <td>192.168.10.0/26</td>
+                    <td>192.168.10.1</td>
+                </tr>
+                <tr>
+                    <td>Zbornica</td>
+                    <td>192.168.10.64/26</td>
+                    <td>192.168.10.65</td>
+                </tr>
+                <tr>
+                    <td>Laboratorij</td>
+                    <td>192.168.10.128/26</td>
+                    <td>192.168.10.129</td>
+                </tr>
+                <tr>
+                    <td>Rezerva</td>
+                    <td>192.168.10.192/26</td>
+                    <td>Još nije dodijeljen</td>
+                </tr>
+            </table>
+            <p>Pristupnik nije automatski prva raspoloživa adresa: to je dogovor u ovom planu. Mora biti valjana adresa
+                odgovarajućeg usmjerničkog sučelja u podmreži.</p>
+            <p>Dobivamo pregledniji plan, odvojene IP mreže i temelj za usmjeravanje i pravila pristupa. Odvojene
+                broadcast domene zahtijevaju odgovarajuću L2 segmentaciju, primjerice VLAN-ove.</p>
+        </section>
+        <section class="slide" data-title="Kalkulator za provjeru">
+            <div class="eyebrow">Kalkulator za provjeru</div>
+            <h1>Prvo izračunaj, zatim provjeri</h1>
+            <p>Upiši IPv4 adresu i prefiks /1–/30. Kalkulator prikazuje uobičajene IPv4 podmreže.</p>
+            <div class="controls"><label>IPv4 adresa <input id="ip" value="192.168.10.70"
+                        inputmode="decimal"></label><label>Prefiks <input id="cp" type="number" min="1" max="30"
+                        value="26"></label><button onclick="calculate()">Izračunaj</button></div>
+            <div id="calc" class="note" aria-live="polite"></div>
+        </section>
+        <section class="slide" data-title="Samostalni rad">
+            <div class="eyebrow">Samostalni rad</div>
+            <h1>Pokušaj bez kalkulatora</h1>
+            <ol>
+                <li>Objasni vlastitim riječima što označavaju jedinice i nule u maski.</li>
+                <li>Za 192.168.20.150/25 odredi masku, mrežnu adresu, broadcast i raspon uređaja.</li>
+                <li>Podijeli 192.168.30.0/24 na četiri jednake podmreže. Koliko adresa za uređaje ima svaka?</li>
+                <li>Jesu li 192.168.10.62/26 i 192.168.10.65/26 u istoj podmreži? Obrazloži.</li>
+            </ol>
+            <details>
+                <summary>Prikaži rješenja</summary>
+                <p>1. Jedinice označuju mrežni dio, nule dio za uređaj.</p>
+                <p>2. Maska 255.255.255.128, mreža 192.168.20.128, broadcast 192.168.20.255, uređaji 192.168.20.129–254.
+                </p>
+                <p>3. /26: 192.168.30.0, .64, .128 i .192, 62 adrese za uređaje po podmreži.</p>
+                <p>4. Ne: prva je u 192.168.10.0/26, druga u 192.168.10.64/26.</p>
+            </details>
+        </section>
+        <section class="slide" data-title="Provjera razumijevanja">
+            <div class="eyebrow">Provjera razumijevanja</div>
+            <h1>Kratki kviz</h1>
+            <div id="quiz"></div><button onclick="grade()">Provjeri odgovore</button> <button class="secondary"
+                onclick="resetQuiz()">Ponovi</button>
+            <div id="score" class="note" aria-live="polite">Odaberi po jedan odgovor za svako pitanje.</div>
+        </section>
+        <section class="slide" data-title="Zaključak">
+            <div class="eyebrow">Zaključak</div>
+            <h1>Maska određuje granicu</h1>
+            <ul>
+                <li>IPv4 adresa ima 32 bita, maska određuje mrežni dio i dio za uređaj.</li>
+                <li>Prefiks /n govori koliko je mrežnih bitova.</li>
+                <li>IP AND maska daje mrežnu adresu.</li>
+                <li>Subnetiranje dijeli blok na manje mreže produljenjem prefiksa.</li>
+                <li>Broj adresa u podmreži smanjuje se kad prefiks raste.</li>
+            </ul>
+            <div class="note">Izlazna kartica: U dvije rečenice objasni ulogu mrežne maske i navedi jedan razlog za
+                subnetiranje. Zatim objasni zašto ista prva tri okteta ne jamče istu /26 podmrežu.</div>
+        </section>
+        <section class="slide" data-title="Za nastavnika i učenike">
+            <div class="eyebrow">Za nastavnika i učenike</div>
+            <h1>Izvori i prijedlog rada</h1>
+            <p>Predloženi tijek za blok-sat: uvod i ponavljanje 10 min; maska i AND 20 min; subnetiranje i školski
+                primjer 20 min; samostalni rad 20 min; kviz i rasprava 15 min; izlazna kartica 5 min.</p>
+            <p>Prije kalkulatora tražiti ručni postupak. Pri vrednovanju ishoda prednost dati objašnjenju, a ne samo
+                brojčanom rezultatu.</p>
+            <h3>Tehnička podloga</h3>
+            <ul>
+                <li><a href="https://www.cisco.com/c/en/us/support/docs/ip/routing-information-protocol-rip/13788-3.html"
+                        target="_blank" rel="noopener">Cisco: Configure IP Addresses and Unique Subnets for New
+                        Users</a> — mrežna maska i podmreže; klasno adresiranje u izvoru povijesni je kontekst.</li>
+                <li><a href="https://www.cisco.com/c/en/us/td/docs/ios-xml/ios/ipaddr_ipv4/configuration/xe-16/ipv4-xe-16-book/configuring_ipv4_addresses.pdf"
+                        target="_blank" rel="noopener">Cisco: Configuring IPv4 Addresses</a> — prefiksi i konfiguracija.
+                </li>
+                <li><a href="https://en.wikipedia.org/wiki/Subnet" target="_blank" rel="noopener">Subnet — pregled AND
+                        operacije i primjera</a></li>
+            </ul>
+            <p>Stranica radi bez interneta; veza je potrebna samo za otvaranje izvora. Odgovori se obrađuju samo u
+                pregledniku i ne šalju se na poslužitelj.</p>
+        </section>
+        <p id="help">Upravljanje: ← → · Home / End · F = cijeli zaslon. U načinu „Svi slajdovi” koristi pomicanje
+            stranice.</p>
+    </main>
+    <footer>
+        <div id="progress"></div><span id="counter"></span><button class="secondary" id="prev"
+            onclick="show(current-1)">← Natrag</button><button id="next" onclick="show(current+1)">Dalje →</button>
+    </footer>
+    <script>let current = 0; const slides = [...document.querySelectorAll('.slide')], jump = document.getElementById('jump'); slides.forEach((s, i) => { let o = document.createElement('option'); o.value = i; o.textContent = (i + 1) + '. ' + s.dataset.title; jump.appendChild(o) }); function show(n) { current = Math.max(0, Math.min(slides.length - 1, n)); slides.forEach((s, i) => s.classList.toggle('active', i === current)); jump.value = current; document.getElementById('counter').textContent = (current + 1) + ' / ' + slides.length; document.getElementById('progress').style.width = ((current + 1) / slides.length * 100) + '%'; document.getElementById('prev').disabled = current === 0; document.getElementById('next').disabled = current === slides.length - 1; if (!document.body.classList.contains('all')) window.scrollTo(0, 0) } jump.onchange = () => show(+jump.value); function toggleAll() { document.body.classList.toggle('all'); document.getElementById('view').textContent = document.body.classList.contains('all') ? 'Prezentacija' : 'Svi slajdovi'; if (!document.body.classList.contains('all')) show(current) } async function full() { try { if (document.fullscreenElement) await document.exitFullscreen(); else await document.documentElement.requestFullscreen() } catch (e) { document.getElementById('help').textContent = 'Cijeli zaslon nije dostupan. Pokušaj tipkom F11.' } } document.addEventListener('keydown', e => { if (['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON', 'SUMMARY', 'A'].includes(e.target.tagName) || e.altKey || e.ctrlKey || e.metaKey) return; if (document.body.classList.contains('all')) return; if (['ArrowRight', 'PageDown', ' '].includes(e.key)) { e.preventDefault(); show(current + 1) } if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); show(current - 1) } if (e.key === 'Home') show(0); if (e.key === 'End') show(slides.length - 1); if (e.key.toLowerCase() === 'f') full() }); function dotted(n) { return [24, 16, 8, 0].map(s => (n >>> s) & 255).join('.') } function info(ip, p) { let v = ip.split('.').reduce((a, b) => a * 256 + Number(b), 0), size = 2 ** (32 - p), network = Math.floor(v / size) * size; return { mask: dotted((0xffffffff << (32 - p)) >>> 0), network, broadcast: network + size - 1, size } } function calculate() { let raw = document.getElementById('ip').value.trim(), pr = document.getElementById('cp').value, p = Number(pr), out = document.getElementById('calc'); if (!/^(\d{1,3}\.){3}\d{1,3}$/.test(raw) || raw.split('.').some(n => +n > 255) || pr === '' || !Number.isInteger(p) || p < 1 || p > 30) { out.classList.add('error'); out.textContent = 'Upiši četiri okteta od 0 do 255 i cijeli prefiks od 1 do 30.'; return } out.classList.remove('error'); let r = info(raw, p); out.innerHTML = '<p>Maska: <code>' + r.mask + '</code></p><p>Mreža: <code>' + dotted(r.network) + '/' + p + '</code> · Broadcast: <code>' + dotted(r.broadcast) + '</code></p><p>Raspon uređaja: <code>' + dotted(r.network + 1) + ' – ' + dotted(r.broadcast - 1) + '</code></p><p>Ukupno adresa: ' + r.size + ' · Adresa za sučelja uređaja: ' + (r.size - 2) + '</p><p>Postupak: ' + (32 - p) + ' host bitova → 2^' + (32 - p) + ' = ' + r.size + ' adresa, za standardnu podmrežu oduzimamo mrežnu i broadcast adresu.</p>' } function lab() { let p = +document.getElementById('prefix').value, r = info('192.168.10.70', p); document.getElementById('pv').textContent = '/' + p; let vals = [['IP', [192, 168, 10, 70]], ['Maska', r.mask.split('.').map(Number)], ['Mreža', dotted(r.network).split('.').map(Number)]]; document.getElementById('bits').innerHTML = vals.map(([name, octets]) => '<div class="bitrow"><small>' + name + '</small>' + octets.map((v, o) => '<span class="octet">' + v.toString(2).padStart(8, '0').split('').map((b, i) => '<span class="bit ' + (o * 8 + i < p ? 'net' : 'host') + '">' + b + '</span>').join('') + '</span>').join('') + '</div>').join(''); document.getElementById('lab').textContent = 'Maska ' + r.mask + ' · Mreža ' + dotted(r.network) + '/' + p + ' · ' + (32 - p) + ' host bitova · ' + r.size + ' ukupnih adresa · ' + (r.size - 2) + ' adresa za uređaje. IP ostaje isti, ali pomicanjem granice mijenjaju se veličina i granice podmreže.' } document.getElementById('prefix').oninput = lab;
+        const questions = [['Što označuje /26?', ['26 uređaja', '26 mrežnih bitova', '26 host bitova'], 1, 'Prefiks broji jedinice u mrežnoj maski.'], ['Koja maska odgovara /25?', ['255.255.255.0', '255.255.255.192', '255.255.255.128'], 2, '25 jedinica znači 24 jedinice u prva tri okteta i još jednu u zadnjem.'], ['Mrežna adresa za 192.168.10.70/26 je…', ['192.168.10.0', '192.168.10.64', '192.168.10.70'], 1, '70 pripada bloku od 64 do 127.'], ['Koliko adresa za uređaje ima obična /26 podmreža?', ['64', '26', '62'], 2, 'Šest host bitova daje 64 adrese, dvije su mrežna i broadcast.'], ['Zašto subnetiramo?', ['Da IP adresa dobije više od 32 bita', 'Da veći blok podijelimo na manje logičke mreže', 'Da automatski blokiramo sav promet među uređajima'], 1, 'Subnetiranje uređuje adresni prostor. Pravila pristupa konfiguriraju se zasebno.'], ['Jesu li .20 i .200 u 192.168.10.0/24 istoj mreži, a uz /26 različitim?', ['Da', 'Ne, uvijek su u istoj', 'Ne, uvijek su u različitim'], 0, 'Uz /24 oba su u mreži .0, uz /26 pripadaju mrežama .0 i .192.']]; function resetQuiz() { document.getElementById('quiz').innerHTML = questions.map((q, i) => '<fieldset class="question"><legend>' + (i + 1) + '. ' + q[0] + '</legend>' + q[1].map((a, j) => '<label><input type="radio" name="q' + i + '" value="' + j + '"> ' + a + '</label>').join('') + '<div class="feedback" id="fb' + i + '"></div></fieldset>').join(''); document.getElementById('score').textContent = 'Odaberi po jedan odgovor za svako pitanje.' } function grade() { let n = 0, answered = 0; questions.forEach((q, i) => { let a = document.querySelector('input[name="q' + i + '"]:checked'), ok = a && +a.value === q[2]; if (a) answered++; if (ok) n++; document.getElementById('fb' + i).textContent = (ok ? 'Točno. ' : a ? 'Netočno. ' : 'Nije odgovoreno. ') + 'Točan odgovor: ' + q[1][q[2]] + '. ' + q[3] }); document.getElementById('score').textContent = 'Rezultat: ' + n + ' / ' + questions.length + '. Odgovoreno: ' + answered + ' / ' + questions.length + '. Pročitaj objašnjenja i usporedi postupke.' } show(0); lab(); calculate(); resetQuiz();</script>
+</body>
+
+</html>
